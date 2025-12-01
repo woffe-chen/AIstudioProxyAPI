@@ -38,6 +38,8 @@ from .utils import (
     use_stream_response,
     calculate_usage_stats,
     maybe_execute_tools,
+    extract_tool_calls_from_text,
+    format_tool_calls_for_response,
 )
 from browser_utils.page_controller import PageController
 from .context_types import RequestContext
@@ -377,7 +379,8 @@ async def _handle_playwright_response(req_id: str, request: ChatCompletionReques
     else:
         # 使用PageController获取响应
         page_controller = PageController(page, logger, req_id)
-        final_content = await page_controller.get_response(check_client_disconnected)
+        final_content = await page_controller.get_response(check_client_disconnected) or ""
+        final_content, parsed_tool_calls = extract_tool_calls_from_text(final_content)
         
         # 计算token使用统计
         usage_stats = calculate_usage_stats(
@@ -391,6 +394,12 @@ async def _handle_playwright_response(req_id: str, request: ChatCompletionReques
         model_name_for_json = current_ai_studio_model_id or MODEL_NAME
         message_payload = {"role": "assistant", "content": final_content}
         finish_reason_val = "stop"
+        if parsed_tool_calls:
+            formatted_calls = format_tool_calls_for_response(parsed_tool_calls)
+            if formatted_calls:
+                message_payload["tool_calls"] = formatted_calls
+                finish_reason_val = "tool_calls"
+
         response_payload = build_chat_completion_response_json(
             req_id,
             model_name_for_json,

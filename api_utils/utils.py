@@ -15,6 +15,7 @@ import os
 import hashlib
 from urllib.parse import urlparse, unquote
 from .tools_registry import execute_tool_call, register_runtime_tools
+from .common_utils import random_id as _random_id
 from .sse import (
     generate_sse_chunk,
     generate_sse_stop_chunk,
@@ -67,7 +68,17 @@ def prepare_combined_prompt(messages: List[Message], req_id: str, tools: Optiona
     # 若声明了可用工具，先在提示前注入工具目录，帮助模型知晓可用函数（内部适配，不影响外部协议）
     if isinstance(tools, list) and len(tools) > 0:
         try:
-            tool_lines: List[str] = ["可用工具目录:"]
+            tool_lines: List[str] = ["\n### 工具调用协议 (CRITICAL)"]
+            tool_lines.append("你是一个拥有工具调用能力的智能助手。")
+            tool_lines.append("当且仅当需要执行工具时，请**严格**遵守以下规则：")
+            tool_lines.append("1. **不要**在回复中描述你要做什么（例如不要说“我将列出文件”）。")
+            tool_lines.append("2. 直接输出以下格式的 JSON 代码块作为工具调用指令：")
+            tool_lines.append("```json")
+            tool_lines.append('{"tool_call": {"name": "工具函数名", "arguments": { ...参数对象... }}}')
+            tool_lines.append("```")
+            tool_lines.append("3. 输出完 JSON 后立即结束回复。")
+            
+            tool_lines.append("\n可用工具定义:")
             for t in tools:
                 name = None
                 params_schema = None
@@ -521,3 +532,124 @@ async def maybe_execute_tools(messages: List[Message], tools: Optional[List[Dict
 def generate_sse_stop_chunk_with_usage(req_id: str, model: str, usage_stats: dict, reason: str = "stop") -> str:
     """生成带usage统计的SSE停止块"""
     return generate_sse_stop_chunk(req_id, model, reason, usage_stats) 
+
+
+_TOOL_BLOCK_PATTERN = re.compile(r"```json\s*(\{[\s\S]*?\})\s*```", re.IGNORECASE)
+_JSON_DECODER = json.JSONDecoder()
+
+
+def _normalize_tool_call_payload(payload: Any) -> Optional[Dict[str, Any]]:
+    """将不同格式的工具调用JSON归一化为 {name, arguments}."""
+    if not isinstance(payload, dict):
+        return None
+    candidate = payload.get("tool_call")
+    if isinstance(candidate, dict):
+        payload = candidate
+    name = payload.get("name")
+    if not isinstance(name, str) or not name.strip():
+        return None
+    arguments = payload.get("arguments")
+    if arguments is None and "params" in payload:
+        arguments = payload.get("params")
+    return {"name": name.strip(), "arguments": arguments}
+
+
+def extract_tool_calls_from_text(response_text: Optional[str]) -> Tuple[str, List[Dict[str, Any]]]:
+    """
+    从 Gemini 的纯文本响应里提取工具调用 JSON，并返回清理后的文本与解析结果。
+    """
+    if not response_text:
+        return "", []
+
+    cleaned_text = response_text
+    tool_calls: List[Dict[str, Any]] = []
+
+    def _consume_block(block_text: str, json_text: str) -> None:
+        nonlocal cleaned_text
+        try:
+            parsed = json.loads(json_text)
+        except json.JSONDecodeError:
+            return
+        normalized = _normalize_tool_call_payload(parsed)
+        if normalized:
+            tool_calls.append(normalized)
+            cleaned_text = cleaned_text.replace(block_text, "", 1)
+
+    # 1) 处理 ```json ... ``` 代码块
+    for match in _TOOL_BLOCK_PATTERN.finditer(response_text):
+        full_block = match.group(0)
+        inner_json = match.group(1)
+        _consume_block(full_block, inner_json)
+
+    # 2) 扫描剩余文本中的裸 JSON 片段
+    idx = 0
+    while idx < len(cleaned_text):
+        ch = cleaned_text[idx]
+        if ch.isspace():
+            idx += 1
+            continue
+        if ch != "{":
+            idx += 1
+            continue
+        try:
+            parsed_obj, offset = _JSON_DECODER.raw_decode(cleaned_text[idx:])
+        except ValueError:
+            idx += 1
+            continue
+        if offset <= 0:
+            idx += 1
+            continue
+
+        normalized = _normalize_tool_call_payload(parsed_obj)
+        if normalized:
+            tool_calls.append(normalized)
+            cleaned_text = cleaned_text[:idx] + cleaned_text[idx + offset :]
+            continue
+
+        idx += offset
+
+    cleaned_text = re.sub(r"\n{3,}", "\n\n", cleaned_text).strip()
+    return cleaned_text, tool_calls
+
+
+def _stringify_tool_arguments(arguments: Any) -> str:
+    """确保工具参数被编码为JSON字符串。"""
+    if arguments is None:
+        return "{}"
+    if isinstance(arguments, str):
+        stripped = arguments.strip()
+        if not stripped:
+            return "{}"
+        try:
+            parsed = json.loads(stripped)
+            return json.dumps(parsed, ensure_ascii=False)
+        except Exception:
+            return stripped
+    try:
+        return json.dumps(arguments, ensure_ascii=False)
+    except Exception:
+        try:
+            return str(arguments)
+        except Exception:
+            return "{}"
+
+
+def format_tool_calls_for_response(parsed_tool_calls: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """将内部解析的工具调用列表转换为 OpenAI 兼容的 tool_calls 结构。"""
+    formatted: List[Dict[str, Any]] = []
+    for idx, item in enumerate(parsed_tool_calls):
+        name = item.get("name")
+        if not name:
+            continue
+        formatted.append(
+            {
+                "id": f"call_{_random_id()}",
+                "index": idx,
+                "type": "function",
+                "function": {
+                    "name": name,
+                    "arguments": _stringify_tool_arguments(item.get("arguments")),
+                },
+            }
+        )
+    return formatted

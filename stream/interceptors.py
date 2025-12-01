@@ -100,6 +100,40 @@ class HttpInterceptor:
             elif len(payload) > 2: # reason
                 resp["reason"] = resp["reason"] + payload[1]
 
+        # ---------------------------------------------------------
+        # [新增] 伪函数调用拦截器 (Pseudo-Function Calling Interceptor)
+        # 检测模型是否输出了 JSON 格式的工具调用指令
+        # ---------------------------------------------------------
+        if resp["body"]:
+            try:
+                # 匹配 ```json { "tool_call": ... } ``` 模式
+                # 使用 re.DOTALL 让 . 匹配换行符，使用 .*? 非贪婪匹配
+                tc_pattern = r'```json\s*(\{.*?"tool_call":.*?\})\s*```'
+                tc_match = re.search(tc_pattern, resp["body"], re.DOTALL)
+                
+                if tc_match:
+                    json_str = tc_match.group(1)
+                    tool_payload = json.loads(json_str)
+                    
+                    if "tool_call" in tool_payload:
+                        tc_data = tool_payload["tool_call"]
+                        func_name = tc_data.get("name")
+                        func_args = tc_data.get("arguments", {})
+                        
+                        if func_name:
+                            # 1. 将其转换为内部的 function 格式，欺骗下游逻辑
+                            resp["function"].append({
+                                "name": func_name,
+                                "params": func_args
+                            })
+                            
+                            # 2. 从文本正文中移除该 JSON 块，避免在 VS Code 聊天界面显示原始代码块
+                            resp["body"] = resp["body"].replace(tc_match.group(0), "")
+            except Exception:
+                # 如果解析失败（例如 JSON 不完整），则忽略，保留原始文本
+                pass
+        # ---------------------------------------------------------
+
         return resp
 
     def parse_toolcall_params(self, args):

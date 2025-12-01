@@ -14,6 +14,8 @@ from .utils import (
     calculate_usage_stats,
     generate_sse_chunk,
     generate_sse_stop_chunk,
+    extract_tool_calls_from_text,
+    format_tool_calls_for_response,
 )
 from .common_utils import random_id
 
@@ -280,7 +282,12 @@ async def gen_sse_from_playwright(
         page_controller = PageController(page, logger, req_id)
         final_content = await page_controller.get_response(check_client_disconnected)
         data_receiving = True
-        lines = final_content.split("\n")
+        final_content = final_content or ""
+        cleaned_content, parsed_tool_calls = extract_tool_calls_from_text(final_content)
+        formatted_tool_calls = (
+            format_tool_calls_for_response(parsed_tool_calls) if parsed_tool_calls else []
+        )
+        lines = cleaned_content.split("\n") if cleaned_content else []
         for line_idx, line in enumerate(lines):
             try:
                 check_client_disconnected(f"Playwright流式生成器循环 ({req_id}): ")
@@ -303,12 +310,17 @@ async def gen_sse_from_playwright(
                 await asyncio.sleep(0.01)
         usage_stats = calculate_usage_stats(
             [msg.model_dump() for msg in request.messages],
-            final_content,
+            cleaned_content,
             "",
         )
         logger.info(f"[{req_id}] Playwright非流式计算的token使用统计: {usage_stats}")
+        finish_reason = "tool_calls" if formatted_tool_calls else "stop"
         yield generate_sse_stop_chunk(
-            req_id, model_name_for_stream, "stop", usage_stats
+            req_id,
+            model_name_for_stream,
+            finish_reason,
+            usage_stats,
+            tool_calls=formatted_tool_calls if formatted_tool_calls else None,
         )
     except ClientDisconnectedError:
         logger.info(f"[{req_id}] Playwright流式生成器中检测到客户端断开连接")
