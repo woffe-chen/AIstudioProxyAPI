@@ -183,6 +183,17 @@ curl -X POST http://127.0.0.1:2048/v1/chat/completions \
 
 打开浏览器访问 `http://127.0.0.1:2048/` 使用内置的 Web 聊天界面。
 
+### 进程管理脚本（推荐）
+
+`scripts/start.sh` 与 `scripts/stop.sh` 提供了更可靠的一键启动/停止体验，适合常驻运行：
+
+```bash
+./scripts/start.sh   # 启动：自动写 PID、输出到 logs/headless.log
+./scripts/stop.sh    # 停止：根据 PID 文件优雅下线
+```
+
+`start.sh` 会在启动前自动检测 `2048/3120/9222` 等核心端口，一旦发现同仓库产生的僵尸进程仍占用端口，就发送 SIGTERM/SIGKILL 清理，避免多次运行后端口被卡住的情况；如果端口被其它项目占用则会直接终止并提示手动处理，确保对外部服务安全。
+
 ---
 
 ## 📦 安装与依赖管理
