@@ -9,7 +9,7 @@
 - **模型与参数管控**：`browser_utils/page_controller.py` 自动切换 AI Studio 模型，精细设置 `temperature/top_p/max_output_tokens/stop/reasoning_effort`，并支持 URL Context、Google Search、Thinking 模式等增强选项。
 - **Gemini 工具调用（Tool Calling）**：
   - 通过提示工程和响应解析实现 OpenAI 风格的函数调用（Function Calling）能力
-  - `stream/interceptors.py` 拦截并解析模型输出的 JSON 格式工具调用指令（`{"tool_call": {...}}`）
+  - `stream/interceptors.py` 拦截并解析模型输出的 JSON 格式工具调用指令（`{"tool_call": {...}}`），并通过流式缓冲/超时机制将跨 chunk 的 ```json``` 代码块组装为完整的函数调用，避免原始 JSON 泄露到客户端
   - `api_utils/utils.py` 在提示中注入工具协议和可用工具目录，引导模型正确输出工具调用格式
   - `api_utils/tools_registry.py` 管理工具注册与执行，支持运行时动态注册 MCP 工具
   - 完全兼容 OpenAI 的 `tools` 和 `tool_choice` 参数
@@ -26,6 +26,7 @@
 - **CLI 启动**：`launch_camoufox.py` 负责 `.env` 载入、Camoufox/Playwright 进程、日志与 auth 目录初始化，可选 headed/headless/debug/virtual-display、stream/helper 端口等参数。
 - **GUI 启动器**：`gui_launcher.py` (Tk) 封装有头/无头/虚拟显示启动、端口占用查询、代理配置和日志回放，便于桌面用户操作。
 - **FastAPI 主应用**：`server.py` -> `api_utils/app.py` 负责加载配置、启动 stream 代理子进程、初始化 Playwright、注册 `/v1/*` 路由、日志 websocket 等。
+- **脚本化运维**：`scripts/start.sh`/`scripts/stop.sh` 提供一键进程管理，启动脚本会在写入 PID 前自动使用 `lsof` 清理占用 `2048/3120/9222` 的遗留 Camoufox/stream 进程，若端口被第三方程序占用则直接提示手动处理，避免同一服务器多次部署后端口被卡住。
 
 ## 代码结构总览
 - `api_utils/`：FastAPI 应用与业务逻辑（请求校验、SSE/WS、模型切换、工具执行、队列管理、路由与错误处理）。
