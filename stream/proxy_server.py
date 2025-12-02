@@ -306,9 +306,16 @@ class ProxyServer:
 
                                 if self.queue is not None:
                                     self.queue.put(json.dumps(resp))
+                            except json.JSONDecodeError as je:
+                                # JSON 解析错误：可能是 body_data 包含多个连续的 JSON 对象
+                                self.logger.debug(f"JSON decode error at position {je.pos}: {je.msg}")
+                                self.logger.debug(f"Body data length: {len(body_data)}, first 500 bytes: {body_data[:500]}")
+                                # 继续处理，不中断流
                             except Exception as e:
-                                # --- FIX: Log the unused exception variable ---
+                                # 其他错误
                                 self.logger.error(f"Error during response interception: {e}")
+                                import traceback
+                                self.logger.debug(f"Traceback: {traceback.format_exc()}")
 
                     # Not enough data to parse headers, forward as is
                     client_writer.write(data)
