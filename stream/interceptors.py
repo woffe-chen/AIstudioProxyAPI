@@ -21,6 +21,11 @@ class HttpInterceptor:
         self._buffer_timeout = 2.0       # 2秒超时（从5秒缩短，避免VSCode认为无响应）
         self._buffer_start_time = None   # 缓冲开始时间
         self._keepalive_count = 0        # 保活消息计数器（用于周期性保活）
+
+        # 统计模式计数器（用于诊断数据丢失）
+        self._parse_call_count = 0        # parse_response 调用次数
+        self._total_body_extracted = 0    # 从 Gemini API 提取的总字节数
+        self._total_body_sent = 0         # 发送给客户端的总字节数
     
     @staticmethod
     def setup_logging():
@@ -67,6 +72,10 @@ class HttpInterceptor:
         """
         Process the response data before sending to the client
         """
+        # 【重要】添加 INFO 日志跟踪调用
+        if self._parse_call_count == 0:  # 首次调用
+            self.logger.info(f"[DEBUG] process_response 首次被调用，数据长度: {len(response_data)}")
+
         try:
             # Handle chunked encoding
             decoded_data, is_done = self._decode_chunked(bytes(response_data))
@@ -78,24 +87,41 @@ class HttpInterceptor:
             # 在响应结束时重置缓冲状态
             if is_done:
                 self._reset_buffer_state()
-                self.logger.debug("响应完成，重置缓冲状态")
+                self.logger.info("[DEBUG] 响应完成，重置缓冲状态")
 
             return result
         except Exception as e:
+            self.logger.error(f"[DEBUG] process_response 发生异常: {e}")
             raise e
 
     def parse_response(self, response_data):
+        # 统计调用次数
+        self._parse_call_count += 1
+
+        # 【原始数据捕获】记录 Gemini API 返回的原始数据
+        # 使用 [RAW_RESPONSE] 标记以便后续分析工具提取
+        if response_data:
+            self.logger.info(f"[RAW_RESPONSE] chunk_{self._parse_call_count}: {response_data}")
+
+        # 【重要】添加 INFO 级别日志以确认方法被调用
+        if self._parse_call_count == 1:
+            self.logger.info(f"[DEBUG] parse_response 首次被调用，数据长度: {len(response_data) if response_data else 0}")
+
         # 添加诊断日志
         if response_data:
             self.logger.debug(f"parse_response: 接收到 {len(response_data)} 字节数据")
             self.logger.debug(f"parse_response: 数据前 200 字节: {response_data[:200]}")
 
-        pattern = rb'\[\[\[null,.*?],"model"]]'
+        pattern = rb'\[\[\[null,.*?],\"model\"]]'
         matches = []
         for match_obj in re.finditer(pattern, response_data):
             matches.append(match_obj.group(0))
 
         self.logger.debug(f"parse_response: 正则匹配到 {len(matches)} 个 JSON 块")
+
+        # 【诊断】如果正则匹配到数据但后续解析失败，记录原始数据
+        if len(matches) > 0 and self._parse_call_count <= 5:
+            self.logger.info(f"[诊断] 匹配到 {len(matches)} 个块，第一个块长度: {len(matches[0])}, 前100字节: {matches[0][:100]}")
 
 
         resp = {
@@ -107,10 +133,13 @@ class HttpInterceptor:
         # Print each full match
         for match in matches:
             try:
-                json_data = json.loads(match)
+                # 【修复】使用 strict=False 允许解析包含未转义换行符的 JSON
+                # Gemini API 返回的 JSON 字符串中可能包含原始换行符，这是技术上无效的 JSON
+                # 但使用 strict=False 可以容忍这些格式问题
+                json_data = json.loads(match, strict=False)
             except json.JSONDecodeError as je:
-                # JSON 解析失败，跳过这个块
-                self.logger.debug(f"跳过无效的 JSON 块 (位置 {je.pos}): {match[:100]}...")
+                # JSON 解析失败（可能是 Extra data 错误），跳过这个块
+                self.logger.debug(f"跳过无效的 JSON 块 (JSONDecodeError at pos {je.pos}): {match[:100]}")
                 continue
             except Exception as e:
                 # 其他解析错误
@@ -120,6 +149,10 @@ class HttpInterceptor:
             try:
                 payload = json_data[0][0]
             except Exception as e:
+                # 【诊断】记录 payload 提取失败
+                self.logger.debug(f"Payload 提取失败: {e}, json_data 结构: {type(json_data)}, 长度: {len(json_data) if hasattr(json_data, '__len__') else 'N/A'}")
+                if isinstance(json_data, list) and len(json_data) > 0:
+                    self.logger.debug(f"json_data[0] 类型: {type(json_data[0])}, 长度: {len(json_data[0]) if hasattr(json_data[0], '__len__') else 'N/A'}")
                 continue
 
             if len(payload)==2: # body
@@ -131,6 +164,12 @@ class HttpInterceptor:
                 resp["function"].append({"name":func_name, "params":params})
             elif len(payload) > 2: # reason
                 resp["reason"] = resp["reason"] + payload[1]
+
+        # 统计从 Gemini API 提取的 body 字节数
+        if resp["body"]:
+            original_body_size = len(resp["body"])
+            self._total_body_extracted += original_body_size
+            self.logger.debug(f"[统计] 本次提取 body: {original_body_size} 字节")
 
         # ---------------------------------------------------------
         # [第三版] 伪函数调用拦截器 (Pseudo-Function Calling Interceptor)
@@ -190,7 +229,8 @@ class HttpInterceptor:
                     # === 状态 C：发送 tool use + 后续内容 ===
                     json_str = tc_match.group(1)
                     try:
-                        tool_payload = json.loads(json_str)
+                        # 【修复】使用 strict=False 以兼容 Gemini 返回的格式
+                        tool_payload = json.loads(json_str, strict=False)
                         if "tool_call" in tool_payload:
                             tc_data = tool_payload["tool_call"]
                             func_name = tc_data.get("name")
@@ -238,33 +278,73 @@ class HttpInterceptor:
 
             else:
                 # === 状态 A（继续）：没有检测到标记，正常发送 ===
-                # 注意：不立即清空缓冲区，以支持跨 chunk 检测
-                # 但如果缓冲区没有可能的标记起始符（反引号），则可以安全发送
-                if '`' not in self._tool_call_buffer:
-                    # 完全安全，立即发送所有内容
+                # 【修复方案】更精确的检测条件：
+                # 只有当缓冲区中已经包含完整的 ```json 标记时才考虑缓冲
+                # 这避免了短 chunk 被过度缓冲的问题
+
+                # 检查是否已经有部分 ```json 标记（支持跨 chunk 检测）
+                # 但不会因为普通的 ` 或 tool_call 字符串就阻塞数据
+                has_partial_marker = (
+                    self._tool_call_buffer.endswith(('`', '``', '```', '```j', '```js', '```jso'))
+                )
+
+                if has_partial_marker and len(self._tool_call_buffer) <= 10:
+                    # 可能正在接收 ```json 标记的开头，但缓冲区很短
+                    # 保留这些内容，等待下一个 chunk
+                    self.logger.debug(f"检测到可能的标记前缀，保留缓冲区 ({len(self._tool_call_buffer)} 字节)")
+                    resp["body"] = ""
+                else:
+                    # 其他情况：立即发送所有内容
+                    # 包括：
+                    # 1. 没有部分标记
+                    # 2. 有部分标记但缓冲区已经很长（>10字节），说明不是真正的标记前缀
                     resp["body"] = self._tool_call_buffer
                     self._tool_call_buffer = ""
-                else:
-                    # 可能包含分散的标记，保留最后一小段用于跨 chunk 检测
-                    # 保留最后 10 个字符（足够包含 "```json" 的任何前缀）
-                    MAX_WINDOW = 10
-                    if len(self._tool_call_buffer) > MAX_WINDOW:
-                        safe_to_send = self._tool_call_buffer[:-MAX_WINDOW]
-                        resp["body"] = safe_to_send
-                        self._tool_call_buffer = self._tool_call_buffer[-MAX_WINDOW:]
-                    else:
-                        # 缓冲区不够长，暂时不发送
-                        resp["body"] = ""
+                    if resp["body"]:
+                        self.logger.debug(f"没有检测到 ```json 标记，发送所有内容: {len(resp['body'])} 字节")
         # ---------------------------------------------------------
+
+        # 统计实际发送的 body 字节数
+        final_body_size = len(resp["body"])
+        self._total_body_sent += final_body_size
+        if final_body_size > 0:
+            self.logger.debug(f"[统计] 本次发送 body: {final_body_size} 字节")
+
+        # 每 10 次调用输出一次统计汇总
+        if self._parse_call_count % 10 == 0:
+            buffer_size = len(self._tool_call_buffer)
+            self.logger.info(
+                f"[统计] 调用: {self._parse_call_count} 次, "
+                f"提取: {self._total_body_extracted} 字节, "
+                f"发送: {self._total_body_sent} 字节, "
+                f"缓冲区: {buffer_size} 字节"
+            )
 
         return resp
 
     def _reset_buffer_state(self):
         """重置缓冲状态（在响应结束时调用）"""
+        # 输出最终统计
+        if self._parse_call_count > 0:
+            data_loss = self._total_body_extracted - self._total_body_sent
+            loss_percentage = (data_loss / max(self._total_body_extracted, 1)) * 100
+            self.logger.info(
+                f"[最终统计] 总调用: {self._parse_call_count}, "
+                f"总提取: {self._total_body_extracted} 字节, "
+                f"总发送: {self._total_body_sent} 字节, "
+                f"丢失: {data_loss} 字节 ({loss_percentage:.1f}%)"
+            )
+
+        # 重置所有状态
         self._tool_call_buffer = ""
         self._is_buffering = False
         self._buffer_start_time = None
         self._keepalive_count = 0
+
+        # 重置统计计数器
+        self._parse_call_count = 0
+        self._total_body_extracted = 0
+        self._total_body_sent = 0
 
     def parse_toolcall_params(self, args):
         try:
