@@ -98,10 +98,31 @@ class HttpInterceptor:
         # 统计调用次数
         self._parse_call_count += 1
 
-        # 【原始数据捕获】记录 Gemini API 返回的原始数据
-        # 使用 [RAW_RESPONSE] 标记以便后续分析工具提取
+        # 【原始数据捕获】将 Gemini API 返回的原始数据写入文件
+        # 避免日志系统截断长数据
         if response_data:
-            self.logger.info(f"[RAW_RESPONSE] chunk_{self._parse_call_count}: {response_data}")
+            try:
+                import os
+                from pathlib import Path
+                debug_dir = Path("debug_output")
+                debug_dir.mkdir(exist_ok=True)
+
+                # 使用 session ID 或时间戳作为文件名
+                raw_file = debug_dir / "gemini_raw_chunks.jsonl"
+
+                # 追加写入，每行一个 JSON 对象
+                import json
+                with open(raw_file, 'a', encoding='utf-8') as f:
+                    chunk_record = {
+                        "chunk_num": self._parse_call_count,
+                        "data_hex": response_data.hex() if isinstance(response_data, bytes) else str(response_data),
+                        "length": len(response_data) if response_data else 0
+                    }
+                    f.write(json.dumps(chunk_record) + '\n')
+
+                self.logger.info(f"[RAW_CAPTURE] chunk_{self._parse_call_count}: {len(response_data)} bytes saved")
+            except Exception as e:
+                self.logger.warning(f"[RAW_CAPTURE] Failed to save chunk: {e}")
 
         # 【重要】添加 INFO 级别日志以确认方法被调用
         if self._parse_call_count == 1:
@@ -112,58 +133,93 @@ class HttpInterceptor:
             self.logger.debug(f"parse_response: 接收到 {len(response_data)} 字节数据")
             self.logger.debug(f"parse_response: 数据前 200 字节: {response_data[:200]}")
 
-        pattern = rb'\[\[\[null,.*?],\"model\"]]'
-        matches = []
-        for match_obj in re.finditer(pattern, response_data):
-            matches.append(match_obj.group(0))
-
-        self.logger.debug(f"parse_response: 正则匹配到 {len(matches)} 个 JSON 块")
-
-        # 【诊断】如果正则匹配到数据但后续解析失败，记录原始数据
-        if len(matches) > 0 and self._parse_call_count <= 5:
-            self.logger.info(f"[诊断] 匹配到 {len(matches)} 个块，第一个块长度: {len(matches[0])}, 前100字节: {matches[0][:100]}")
-
-
         resp = {
             "reason": "",
             "body": "",
             "function": [],
         }
 
-        # Print each full match
-        for match in matches:
+        # ---------------------------------------------------------
+        # 【方案 C】直接提取内容字符串（跳过复杂的 JSON 嵌套解析）
+        #
+        # 背景：Gemini API 返回的数据结构嵌套层数不固定（3-8层），
+        # 原正则 rb'\[\[\[null,.*?],"model"]]' 无法正确匹配，导致 JSON 解析失败。
+        #
+        # 新方案：直接匹配 [null,"内容" 模式，提取内容字符串，
+        # 无需解析完整 JSON 结构，兼容任意嵌套层数。
+        # ---------------------------------------------------------
+
+        # 匹配 [null,"内容"] 模式，提取引号内的内容
+        # 支持内容中包含转义字符（如 \" \n \\）
+        content_pattern = rb'\[null,"((?:[^"\\]|\\.)*)"'
+        content_matches = list(re.finditer(content_pattern, response_data))
+
+        self.logger.debug(f"parse_response: 直接提取匹配到 {len(content_matches)} 个内容块")
+
+        # 用于去重（流式响应中后续 chunk 会包含之前的内容）
+        seen_contents = set()
+
+        for match in content_matches:
             try:
-                # 【修复】使用 strict=False 允许解析包含未转义换行符的 JSON
-                # Gemini API 返回的 JSON 字符串中可能包含原始换行符，这是技术上无效的 JSON
-                # 但使用 strict=False 可以容忍这些格式问题
-                json_data = json.loads(match, strict=False)
-            except json.JSONDecodeError as je:
-                # JSON 解析失败（可能是 Extra data 错误），跳过这个块
-                self.logger.debug(f"跳过无效的 JSON 块 (JSONDecodeError at pos {je.pos}): {match[:100]}")
-                continue
+                content_bytes = match.group(1)
+                # 解码并处理转义字符
+                content = content_bytes.decode('utf-8')
+                content = content.replace('\\n', '\n').replace('\\t', '\t')
+                content = content.replace('\\"', '"').replace('\\\\', '\\')
+
+                # 去重检查（取前100字符作为指纹）
+                fingerprint = content[:100] if len(content) > 100 else content
+                if fingerprint in seen_contents:
+                    continue
+                seen_contents.add(fingerprint)
+
+                # 检查是否是 tool_call JSON
+                if content.strip().startswith('{') and 'tool_call' in content:
+                    try:
+                        tool_payload = json.loads(content, strict=False)
+                        if "tool_call" in tool_payload:
+                            tc_data = tool_payload["tool_call"]
+                            func_name = tc_data.get("name")
+                            func_args = tc_data.get("arguments", {})
+                            if func_name:
+                                resp["function"].append({
+                                    "name": func_name,
+                                    "params": func_args
+                                })
+                                self.logger.info(f"[提取] ✓ tool_call: {func_name}")
+                    except json.JSONDecodeError:
+                        # 不是有效的 tool_call JSON，当作普通文本处理
+                        resp["body"] += content
+                        self.logger.debug(f"[提取] 内容看起来像 JSON 但解析失败，当作文本处理")
+                else:
+                    # 普通文本内容
+                    resp["body"] += content
+                    self.logger.debug(f"[提取] ✓ 文本内容: {len(content)} 字符")
+
             except Exception as e:
-                # 其他解析错误
-                self.logger.debug(f"JSON 解析遇到异常: {e}, 跳过该块")
+                self.logger.debug(f"[提取] 内容解码失败: {e}")
                 continue
 
+        # 兼容旧格式：保留对原生 function calling 的支持（payload[10] 格式）
+        # 这部分处理 Gemini 原生的 function calling 响应（非提示工程方式）
+        old_pattern = rb'\[\[\[null,.*?\],\"model\"\]\]'
+        old_matches = list(re.finditer(old_pattern, response_data))
+
+        for match in old_matches:
             try:
+                json_data = json.loads(match.group(0), strict=False)
                 payload = json_data[0][0]
-            except Exception as e:
-                # 【诊断】记录 payload 提取失败
-                self.logger.debug(f"Payload 提取失败: {e}, json_data 结构: {type(json_data)}, 长度: {len(json_data) if hasattr(json_data, '__len__') else 'N/A'}")
-                if isinstance(json_data, list) and len(json_data) > 0:
-                    self.logger.debug(f"json_data[0] 类型: {type(json_data[0])}, 长度: {len(json_data[0]) if hasattr(json_data[0], '__len__') else 'N/A'}")
-                continue
 
-            if len(payload)==2: # body
-                resp["body"] = resp["body"] + payload[1]
-            elif len(payload) == 11 and payload[1] is None and type(payload[10]) == list:  # function
-                array_tool_calls = payload[10]
-                func_name = array_tool_calls[0]
-                params = self.parse_toolcall_params(array_tool_calls[1])
-                resp["function"].append({"name":func_name, "params":params})
-            elif len(payload) > 2: # reason
-                resp["reason"] = resp["reason"] + payload[1]
+                # 只处理原生 function calling 格式 (len=11, payload[10] 是函数调用)
+                if len(payload) == 11 and payload[1] is None and isinstance(payload[10], list):
+                    array_tool_calls = payload[10]
+                    func_name = array_tool_calls[0]
+                    params = self.parse_toolcall_params(array_tool_calls[1])
+                    resp["function"].append({"name": func_name, "params": params})
+                    self.logger.info(f"[提取] ✓ 原生 function call: {func_name}")
+            except:
+                # 解析失败，跳过（内容已经通过方案 C 提取）
+                pass
 
         # 统计从 Gemini API 提取的 body 字节数
         if resp["body"]:

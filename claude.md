@@ -1769,3 +1769,477 @@ def parse_response(self, response_data):
 **文档最后更新**: 2025-12-02 19:00
 **当前版本**: 第三版流式缓冲机制 + 激进缓冲窗口修复（问题持续）
 **状态**: ⚠️ 数据丢失问题仍存在，📋 已制定三层调试策略，⏳ 待实施方案 C
+
+---
+
+# 🔬 原始响应数据捕获与分析（2025-12-03）
+
+## 📋 新问题：数据捕获工具失败
+
+在尝试使用 `capture_gemini_raw_response.py` 分析原始响应数据时，发现该工具显示：
+- **0 字节，0 字符内容**
+- 虽然找到了 8 个 chunk 标记，但无法提取实际内容
+
+## 🔍 问题根源分析
+
+### 原始方案的缺陷
+
+之前在 `stream/interceptors.py` 中使用日志记录原始数据：
+
+```python
+self.logger.info(f"[RAW_RESPONSE] chunk_{self._parse_call_count}: {response_data}")
+```
+
+**问题**：
+1. Python 日志系统会调用 `repr(response_data)` 获取字符串表示
+2. 日志框架会**截断过长的输出**（内部限制）
+3. 导致 JSON 数据不完整：
+   - 测试发现：开括号 `[` 有 11 个，闭括号 `]` 只有 9 个
+   - JSON 解析失败：`Expecting ',' delimiter: line 1 column 534 (char 533)`
+
+### 验证过程
+
+```bash
+# 从日志中提取的 chunk 数据
+chunk_bytes = b'[[[[[[[[null,"...'  # 533 字节
+
+# 括号统计
+开括号 [: 11
+闭括号 ]: 9
+差异: 2  # 数据被截断！
+```
+
+---
+
+## ✅ 解决方案：文件写入代替日志
+
+### 方案设计
+
+**核心思路**：将原始数据以 hex 编码写入 JSONL 文件，避免任何截断
+
+### 实现细节
+
+#### 1. 修改 `stream/interceptors.py` (行 101-125)
+
+```python
+# 【原始数据捕获】将 Gemini API 返回的原始数据写入文件
+# 避免日志系统截断长数据
+if response_data:
+    try:
+        from pathlib import Path
+        debug_dir = Path("debug_output")
+        debug_dir.mkdir(exist_ok=True)
+
+        raw_file = debug_dir / "gemini_raw_chunks.jsonl"
+
+        # 追加写入，每行一个 JSON 对象
+        import json
+        with open(raw_file, 'a', encoding='utf-8') as f:
+            chunk_record = {
+                "chunk_num": self._parse_call_count,
+                "data_hex": response_data.hex() if isinstance(response_data, bytes) else str(response_data),
+                "length": len(response_data) if response_data else 0
+            }
+            f.write(json.dumps(chunk_record) + '\n')
+
+        self.logger.info(f"[RAW_CAPTURE] chunk_{self._parse_call_count}: {len(response_data)} bytes saved")
+    except Exception as e:
+        self.logger.warning(f"[RAW_CAPTURE] Failed to save chunk: {e}")
+```
+
+**关键改进**：
+- ✅ 使用 **hex 编码**：`response_data.hex()` 保存完整字节
+- ✅ **JSONL 格式**：每行一个 JSON 对象，易于追加和解析
+- ✅ **绝不截断**：文件 I/O 保证完整性
+- ✅ 日志中只记录字节数，不记录内容
+
+#### 2. 创建 `analyze_raw_chunks.py` 分析工具
+
+```python
+#!/usr/bin/env python3
+"""
+Gemini 原始响应完整分析工具
+从 debug_output/gemini_raw_chunks.jsonl 读取完整的原始数据并进行深度分析
+"""
+
+import json
+from pathlib import Path
+from datetime import datetime
+
+
+def analyze_raw_chunks():
+    chunks_file = Path('debug_output/gemini_raw_chunks.jsonl')
+    
+    if not chunks_file.exists():
+        print(f"❌ 文件不存在: {chunks_file}")
+        return
+
+    # 读取所有 chunk
+    chunks = []
+    with open(chunks_file, 'r', encoding='utf-8') as f:
+        for line in f:
+            if line.strip():
+                chunks.append(json.loads(line))
+
+    print(f"✅ 找到 {len(chunks)} 个原始响应 chunk")
+
+    # 生成详细分析报告
+    output_dir = Path('debug_output')
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    output_file = output_dir / f'gemini_complete_analysis_{timestamp}.txt'
+
+    all_contents = []
+    
+    with open(output_file, 'w', encoding='utf-8') as f:
+        for chunk in chunks:
+            chunk_num = chunk['chunk_num']
+            data_hex = chunk['data_hex']
+            length = chunk['length']
+
+            # 从 hex 恢复字节
+            chunk_bytes = bytes.fromhex(data_hex)
+            chunk_str = chunk_bytes.decode('utf-8')
+
+            f.write(f"--- Chunk {chunk_num} ---\n")
+            f.write(f"字节长度: {length}\n")
+
+            # 尝试解析 JSON
+            try:
+                data = json.loads(chunk_str, strict=False)
+                f.write("✅ JSON 解析成功\n")
+
+                # 递归提取所有内容
+                def extract_content(obj):
+                    contents = []
+                    if isinstance(obj, list):
+                        for item in obj:
+                            # 检查 [[...], "model"] 模式
+                            if isinstance(item, list) and len(item) >= 2 and item[1] == "model":
+                                payload_list = item[0]
+                                for payload in payload_list:
+                                    if isinstance(payload, list) and len(payload) >= 2:
+                                        content = payload[1]
+                                        if content and isinstance(content, str):
+                                            contents.append(content)
+                            # 递归
+                            contents.extend(extract_content(item))
+                    return contents
+
+                contents = extract_content(data)
+                
+                if contents:
+                    f.write(f"提取到 {len(contents)} 个内容块:\n")
+                    for idx, content in enumerate(contents):
+                        f.write(f"\n  内容块 {idx+1}:\n")
+                        f.write(f"  长度: {len(content)} 字符\n")
+                        f.write(f"  预览: {content[:100]}...\n")
+                        all_contents.append(content)
+
+            except json.JSONDecodeError as e:
+                f.write(f"❌ JSON 解析失败: {e}\n")
+
+            f.write("\n")
+
+    print(f"✅ 详细分析已保存到: {output_file}")
+    print(f"📈 总计: {len(chunks)} 个 chunk, 提取 {len(all_contents)} 个内容块")
+```
+
+**算法核心**：递归查找 `[[...], "model"]` 模式并提取内容
+
+---
+
+## 📊 验证结果
+
+### 测试案例（2025-12-03 16:04:33）
+
+**请求信息**：
+- 模型: `gemini-3-pro-preview`
+- 提示: 30,026 字符（包含工具定义）
+- 工具: `run_in_terminal` (列出 conda 环境)
+
+**捕获统计**：
+- 总 Chunks: 7 个
+- Chunk 2: 557 bytes
+- Chunk 3: 1,039 bytes
+- Chunk 4: 1,394 bytes
+- Chunk 5: 2,612 bytes
+- Chunk 6: 2,669 bytes ⭐ 最后一个完整 chunk
+- Chunk 7: 2,671 bytes
+
+**提取结果（从 Chunk 7）**：
+
+```
+📝 内容块 1 (340 字符):
+**Inspecting Conda Environments**
+
+I've determined I need to check for available tools to list the current 
+conda environments. Running `conda info --envs` or `conda env list` in 
+a terminal is the standard approach...
+
+📝 内容块 2 (266 字符):
+**Executing Environment Listing**
+
+I'm now integrating `run_in_terminal` to execute `conda info --envs`. 
+The specific command will be `conda env list`, as it's a standard method...
+
+📝 内容块 3 (144 字符):
+{"tool_call": {"name": "run_in_terminal", "arguments": {"command": "conda info --envs", 
+"explanation": "列出所有 conda 环境", "isBackground": false}}}
+```
+
+✅ **成功提取**：
+- 思考过程（2个内容块）
+- 完整的工具调用 JSON（1个内容块）
+- 总计 750 字符内容
+
+---
+
+## 🎯 关键发现
+
+### 数据捕获层面 ✅
+
+**验证成功**：
+1. 所有 chunk 数据完整保存
+2. JSON 可以正确解析
+3. 工具调用内容完整提取
+
+**数据结构解析**：
+
+Gemini API 的流式响应格式（嵌套数组）：
+```python
+[
+    [  # 第一层：响应数据包装
+        [  # 第二层：数据块数组
+            [  # 第三层：单个数据块
+                [
+                    [
+                        [
+                            [
+                                null,
+                                "实际文本内容",  # ← 这里是我们需要的
+                                null,
+                                # ... 其他元数据
+                                1
+                            ]
+                        ],
+                        "model"  # ← 标识符，用于识别数据块
+                    ]
+                ]
+            ],
+            null,
+            [元数据...],
+            null,
+            null,
+            null,
+            null,
+            "版本ID"
+        ],
+        # 可能有多个数据块...
+    ]
+]
+```
+
+**识别模式**：`[[内容数组], "model"]`
+
+### 数据转发问题 ❌
+
+**仍未解决**：
+- 日志显示：`completion_tokens: 0`
+- 日志显示：`总提取: 0 字节, 总发送: 0 字节`
+- 诊断日志：`匹配到 3 个块，第一个块长度: 382`
+
+**矛盾现象**：
+- ✅ 正则表达式匹配到了数据块
+- ❌ 但最终统计显示提取 0 字节
+- ❌ 客户端没有收到任何内容
+
+**结论**：问题不在数据捕获，而在**提取后的过滤或转发逻辑**
+
+---
+
+## 🛠️ 使用指南
+
+### 日常使用
+
+```bash
+# 1. 清理旧数据（可选）
+rm -f debug_output/gemini_raw_chunks.jsonl
+
+# 2. 服务会自动捕获数据到文件
+# （每次请求自动追加）
+
+# 3. 运行分析工具
+python3 analyze_raw_chunks.py
+
+# 4. 查看详细报告
+cat debug_output/gemini_complete_analysis_*.txt
+```
+
+### 手动查看数据
+
+```bash
+# 查看 JSONL 文件
+cat debug_output/gemini_raw_chunks.jsonl
+
+# 解析最后一个 chunk
+python3 << 'EOF'
+import json
+lines = open('debug_output/gemini_raw_chunks.jsonl').readlines()
+chunk = json.loads(lines[-1])
+data = bytes.fromhex(chunk['data_hex']).decode('utf-8')
+print(f"Chunk {chunk['chunk_num']}: {chunk['length']} bytes")
+print(data)
+EOF
+```
+
+---
+
+## 🔧 正则表达式重构：方案 C（2025-12-03）
+
+### 问题发现
+
+在实际测试中发现**内容提取完全失败**（0 字节），通过添加诊断日志追踪到根本原因：
+
+#### 原正则与实际数据结构不匹配
+
+| 项目 | 原正则期望 | Gemini 实际返回 |
+|------|-----------|----------------|
+| **模式** | `[[[null,...],"model"]]` | `[[[[[[[[null,...]]],"model"]]]` |
+| **嵌套层数** | 3 层 `[` | 6-8 层 `[` |
+| **匹配结果** | 括号不平衡 `[ x3, ] x4` | JSON 解析失败 |
+
+#### 数据流断点分析
+
+```
+Gemini API 返回数据 (1402 bytes)
+       ↓
+原正则匹配 ✅ 成功匹配到 3 个块
+       ↓
+json.loads() ❌ 全部失败！
+    └─ 错误: "Extra data: line 1 column XXX"
+    └─ 原因: 匹配结果括号不平衡，不是有效 JSON
+       ↓
+except → continue (静默跳过)
+       ↓
+所有数据丢失 → 统计显示 0 字节提取
+```
+
+### 解决方案：方案 C - 直接提取内容字符串
+
+**核心思路**：不再尝试匹配完整的 JSON 结构，而是直接提取 `[null,"内容"]` 模式中的内容字符串。
+
+#### 新正则表达式
+
+```python
+# 原正则（失败）
+pattern = rb'\[\[\[null,.*?],\"model\"]]'
+
+# 新正则（方案 C）
+content_pattern = rb'\[null,"((?:[^"\\]|\\.)*)"'
+```
+
+#### 新逻辑流程
+
+```
+Gemini 响应数据
+       ↓
+正则匹配 [null,"内容"] 模式
+       ↓
+解码 + 处理转义字符 (\n, \", \\)
+       ↓
+去重检查（流式响应会重复之前的内容）
+       ↓
+├── 包含 "tool_call" → 解析为函数调用
+└── 普通文本 → 添加到 body
+       ↓
+保留旧格式兼容（原生 function calling）
+```
+
+### 代码实现
+
+**位置**: [stream/interceptors.py:142-222](stream/interceptors.py#L142-L222)
+
+```python
+# 【方案 C】直接提取内容字符串（跳过复杂的 JSON 嵌套解析）
+content_pattern = rb'\[null,"((?:[^"\\]|\\.)*)"'
+content_matches = list(re.finditer(content_pattern, response_data))
+
+# 用于去重（流式响应中后续 chunk 会包含之前的内容）
+seen_contents = set()
+
+for match in content_matches:
+    content_bytes = match.group(1)
+    # 解码并处理转义字符
+    content = content_bytes.decode('utf-8')
+    content = content.replace('\\n', '\n').replace('\\t', '\t')
+    content = content.replace('\\"', '"').replace('\\\\', '\\')
+
+    # 去重检查
+    fingerprint = content[:100] if len(content) > 100 else content
+    if fingerprint in seen_contents:
+        continue
+    seen_contents.add(fingerprint)
+
+    # 检查是否是 tool_call JSON
+    if content.strip().startswith('{') and 'tool_call' in content:
+        tool_payload = json.loads(content, strict=False)
+        # 提取函数调用...
+    else:
+        # 普通文本内容
+        resp["body"] += content
+```
+
+### 测试验证
+
+| 指标 | 原方案 | 方案 C |
+|------|--------|--------|
+| 正则匹配 | 3 个块 | 3 个块 |
+| JSON 解析 | 0 成功 | N/A（不需要） |
+| 内容提取 | **0 字节** | **758 字符** ✅ |
+| tool_call 识别 | ❌ 失败 | ✅ 成功 |
+
+### 方案优势
+
+- ✅ **兼容任意嵌套深度**：3层、6层、8层都能正确提取
+- ✅ **简单可靠**：不依赖复杂的 JSON 结构解析
+- ✅ **转义字符处理**：正确处理 `\n`, `\"`, `\\`
+- ✅ **去重机制**：避免流式响应中的重复内容
+- ✅ **向后兼容**：保留对原生 function calling 的支持
+
+---
+
+## 当前工作状态（2025-12-03）
+
+### 已完成
+
+1. ✅ **第三版流式缓冲机制** - 周期性保活 + 跨 chunk 检测
+2. ✅ **方案 C 正则重构** - 解决 0 字节提取问题
+3. ✅ **原始数据捕获工具** - hex 编码保存完整数据
+4. ✅ **测试验证通过** - 内容提取和 tool_call 识别正常
+
+### 核心文件
+
+| 文件 | 功能 |
+|------|------|
+| `stream/interceptors.py` | 核心拦截器，包含方案 C 实现 |
+| `stream/proxy_server.py` | 代理服务器 |
+| `debug_output/gemini_raw_chunks.jsonl` | 原始响应数据（调试用） |
+| `analyze_raw_chunks.py` | 原始数据分析工具 |
+
+### 数据流架构
+
+```
+Gemini API
+    ↓
+proxy_server.py (HTTP 代理)
+    ↓
+interceptors.py
+    ├── 原始数据捕获 → gemini_raw_chunks.jsonl
+    ├── 方案 C 内容提取 → resp["body"]
+    ├── tool_call 识别 → resp["function"]
+    └── 流式缓冲（第三版）→ 隐藏 ```json 块
+    ↓
+response_generators.py (SSE 生成)
+    ↓
+客户端
+```
