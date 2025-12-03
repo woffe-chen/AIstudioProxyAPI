@@ -1,0 +1,121 @@
+================================================================================
+Gemini API 原始响应数据
+捕获时间: 2025-12-03 15:48:43.029347
+================================================================================
+
+--- Chunk 2 ---
+原始数据: b'[[[[[[[[null,"**Acknowledging User Input**\\n\\nI\'ve registered the user\'s initial greeting. My immediate priority is to respond politely and professionally. I\'ll then proactively offer my assistance, inquiring about their needs. With no context provided, no tools need to be engaged at this time.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]],null,[7291,null,7291,null,[[1,7291]]],null,null,null,null,"v1_ChdJMWd3YVl1UEM2enB6N0lQamJMajBRdxIXSTFnd2FZdVBDNnpwejdJUGpiTGowUXc"],[[[[[[null,"\xe4\xbd\xa0\xe5\xa5\xbd\xef\xbc\x81\xe6\x88\x91\xe6\x98\xaf GitHub Copilot\xe3\x80\x82\xe6\x9c\x89\xe4\xbb\x80\xe4\xb9\x88\xe6\x88\x91\xe5\x8f\xaf\xe4\xbb\xa5\xe5\xb8\xae\xe4\xbd\xa0\xe7\x9a\x84\xe5\x90\x97\xef\xbc\x9f"]],"model"]]],null,[7291,13,7366,null,[[1,7291]],null,null,null,null,62],null,null,null,null,"v1_ChdJMWd3YVl1UEM2enB6N0lQamJMajBRdxIXSTFnd2FZdVBDNnpwejdJUGpiTGowUXc"],[[[[[[null,"",null,null,null,null,null,null,null,null,null,null,null,null,"EtkCCtYCAXLI2nzSXkWsN6leBd8J/JRCIVOIiHEI91GSOg2ZiOs8mkitvCXTV+5KLMstaGAW3Pfs7VEwlz2S7J+1L4P1C7eshWj50+fe70/eXF6/8BxQUekCUhtsL0YRGmXzKxH5vcRCI/zRLzSzyV0233yVPEz9oHRdGG0yV8eLJnEd0k6AWWBicNHOn2bzAa3gO9Oi7cjUakA2iOKXM8sme5nvxbAsY71nA9ftostSe6yUUIoow7vRI0y5CcyYqRGs4JSnDWO7rcGXdUHv4EWknUUxom0yj9/cVcYQRVm81zgERMq8zgDwqaOFjcyTXhduZDGLYEMCh0PHcSagUqnGZf8tRjToZazsqmVeNXz0yy5l8D2v7E43HpR3xiQm3ThChWcOWxyWLQdgofAANyJ0gMxA2v6po0yvved9ZOAE60tieUjSatDyEhyt7CLxQYzMOlNWDARYiv/9"]],"model"],1]],null,[7291,13,7366,null,[[1,7291]],null,null,null,null,62],null,null,null,null,"v1_ChdJMWd3YVl1UEM2enB6N0lQamJMajBRdxIXSTFnd2FZdVBDNnpwejdJUGpiTGowUXc"]'
+字节长度: 1454
+JSON 块数量: 2
+
+  JSON 块 1:
+  原始: b'[[[null,"**Acknowledging User Input**\\n\\nI\'ve registered the user\'s initial greeting. My immediate priority is to respond politely and professionally. I\'ll then proactively offer my assistance, inquiring about their needs. With no context provided, no tools need to be engaged at this time.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 361 (char 360)
+
+  JSON 块 2:
+  原始: b'[[[null,"\xe4\xbd\xa0\xe5\xa5\xbd\xef\xbc\x81\xe6\x88\x91\xe6\x98\xaf GitHub Copilot\xe3\x80\x82\xe6\x9c\x89\xe4\xbb\x80\xe4\xb9\x88\xe6\x88\x91\xe5\x8f\xaf\xe4\xbb\xa5\xe5\xb8\xae\xe4\xbd\xa0\xe7\x9a\x84\xe5\x90\x97\xef\xbc\x9f"]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 54 (char 53)
+
+--- Chunk 3 ---
+原始数据: b'[[[[[[[[null,"**Acknowledging User Input**\\n\\nI\'ve registered the user\'s initial greeting. My immediate priority is to respond politely and professionally. I\'ll then proactively offer my assistance, inquiring about their needs. With no context provided, no tools need to be engaged at this time.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]],null,[7291,null,7291,null,[[1,7291]]],null,null,null,null,"v1_ChdJMWd3YVl1UEM2enB6N0lQamJMajBRdxIXSTFnd2FZdVBDNnpwejdJUGpiTGowUXc"],[[[[[[null,"\xe4\xbd\xa0\xe5\xa5\xbd\xef\xbc\x81\xe6\x88\x91\xe6\x98\xaf GitHub Copilot\xe3\x80\x82\xe6\x9c\x89\xe4\xbb\x80\xe4\xb9\x88\xe6\x88\x91\xe5\x8f\xaf\xe4\xbb\xa5\xe5\xb8\xae\xe4\xbd\xa0\xe7\x9a\x84\xe5\x90\x97\xef\xbc\x9f"]],"model"]]],null,[7291,13,7366,null,[[1,7291]],null,null,null,null,62],null,null,null,null,"v1_ChdJMWd3YVl1UEM2enB6N0lQamJMajBRdxIXSTFnd2FZdVBDNnpwejdJUGpiTGowUXc"],[[[[[[null,"",null,null,null,null,null,null,null,null,null,null,null,null,"EtkCCtYCAXLI2nzSXkWsN6leBd8J/JRCIVOIiHEI91GSOg2ZiOs8mkitvCXTV+5KLMstaGAW3Pfs7VEwlz2S7J+1L4P1C7eshWj50+fe70/eXF6/8BxQUekCUhtsL0YRGmXzKxH5vcRCI/zRLzSzyV0233yVPEz9oHRdGG0yV8eLJnEd0k6AWWBicNHOn2bzAa3gO9Oi7cjUakA2iOKXM8sme5nvxbAsY71nA9ftostSe6yUUIoow7vRI0y5CcyYqRGs4JSnDWO7rcGXdUHv4EWknUUxom0yj9/cVcYQRVm81zgERMq8zgDwqaOFjcyTXhduZDGLYEMCh0PHcSagUqnGZf8tRjToZazsqmVeNXz0yy5l8D2v7E43HpR3xiQm3ThChWcOWxyWLQdgofAANyJ0gMxA2v6po0yvved9ZOAE60tieUjSatDyEhyt7CLxQYzMOlNWDARYiv/9"]],"model"],1]],null,[7291,13,7366,null,[[1,7291]],null,null,null,null,62],null,null,null,null,"v1_ChdJMWd3YVl1UEM2enB6N0lQamJMajBRdxIXSTFnd2FZdVBDNnpwejdJUGpiTGowUXc"],[null,null,null,["1764775971182155",5502124,3392723213]]]]'
+字节长度: 1513
+JSON 块数量: 2
+
+  JSON 块 1:
+  原始: b'[[[null,"**Acknowledging User Input**\\n\\nI\'ve registered the user\'s initial greeting. My immediate priority is to respond politely and professionally. I\'ll then proactively offer my assistance, inquiring about their needs. With no context provided, no tools need to be engaged at this time.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 361 (char 360)
+
+  JSON 块 2:
+  原始: b'[[[null,"\xe4\xbd\xa0\xe5\xa5\xbd\xef\xbc\x81\xe6\x88\x91\xe6\x98\xaf GitHub Copilot\xe3\x80\x82\xe6\x9c\x89\xe4\xbb\x80\xe4\xb9\x88\xe6\x88\x91\xe5\x8f\xaf\xe4\xbb\xa5\xe5\xb8\xae\xe4\xbd\xa0\xe7\x9a\x84\xe5\x90\x97\xef\xbc\x9f"]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 54 (char 53)
+
+--- Chunk 1 ---
+原始数据: b'[[[[[[[[null,"**Investigating Conda Environments**\\n\\nI\'m thinking about how to show the user their current conda environments. My initial plan is to use the `run_in_terminal` tool to execute either `conda info --envs` or `conda env list`. I\'m also remembering that the user is on zsh, so the exact commands might need adjusting.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]],null,[7705,null,7705,null,[[1,7705]]],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"]'
+字节长度: 533
+JSON 块数量: 1
+
+  JSON 块 1:
+  原始: b'[[[null,"**Investigating Conda Environments**\\n\\nI\'m thinking about how to show the user their current conda environments. My initial plan is to use the `run_in_terminal` tool to execute either `conda info --envs` or `conda env list`. I\'m also remembering that the user is on zsh, so the exact commands might need adjusting.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 395 (char 394)
+
+--- Chunk 2 ---
+原始数据: b'[[[[[[[[null,"**Investigating Conda Environments**\\n\\nI\'m thinking about how to show the user their current conda environments. My initial plan is to use the `run_in_terminal` tool to execute either `conda info --envs` or `conda env list`. I\'m also remembering that the user is on zsh, so the exact commands might need adjusting.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]],null,[7705,null,7705,null,[[1,7705]]],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[[[[[[null,"**Formulating the Tool Call**\\n\\nI\'ve decided to use `run_in_terminal` to get the list. The specific command will be `conda env list`, as it\'s a standard method. I also want the output immediately, so I\'ll set `isBackground` to `false`. Now, I\'m working on the final tool call structure.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]],null,[7705,null,7705,null,[[1,7705]]],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"]'
+字节长度: 1037
+JSON 块数量: 2
+
+  JSON 块 1:
+  原始: b'[[[null,"**Investigating Conda Environments**\\n\\nI\'m thinking about how to show the user their current conda environments. My initial plan is to use the `run_in_terminal` tool to execute either `conda info --envs` or `conda env list`. I\'m also remembering that the user is on zsh, so the exact commands might need adjusting.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 395 (char 394)
+
+  JSON 块 2:
+  原始: b'[[[null,"**Formulating the Tool Call**\\n\\nI\'ve decided to use `run_in_terminal` to get the list. The specific command will be `conda env list`, as it\'s a standard method. I also want the output immediately, so I\'ll set `isBackground` to `false`. Now, I\'m working on the final tool call structure.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 367 (char 366)
+
+--- Chunk 3 ---
+原始数据: b'[[[[[[[[null,"**Investigating Conda Environments**\\n\\nI\'m thinking about how to show the user their current conda environments. My initial plan is to use the `run_in_terminal` tool to execute either `conda info --envs` or `conda env list`. I\'m also remembering that the user is on zsh, so the exact commands might need adjusting.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]],null,[7705,null,7705,null,[[1,7705]]],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[[[[[[null,"**Formulating the Tool Call**\\n\\nI\'ve decided to use `run_in_terminal` to get the list. The specific command will be `conda env list`, as it\'s a standard method. I also want the output immediately, so I\'ll set `isBackground` to `false`. Now, I\'m working on the final tool call structure.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]],null,[7705,null,7705,null,[[1,7705]]],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[[[[[[null,"{\\"tool_call\\": {\\"name\\": \\"run_in_terminal\\", \\"arguments\\": {\\"command\\": \\"conda env list\\", \\"explanation\\": \\"\xe5\x88\x97\xe5\x87\xba\xe6\x89\x80\xe6\x9c\x89 conda \xe7\x8e\xaf\xe5\xa2\x83\\", \\"isBackground\\": false}}}"]],"model"]]],null,[7705,42,7873,null,[[1,7705]],null,null,null,null,126],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"]'
+字节长度: 1389
+JSON 块数量: 3
+
+  JSON 块 1:
+  原始: b'[[[null,"**Investigating Conda Environments**\\n\\nI\'m thinking about how to show the user their current conda environments. My initial plan is to use the `run_in_terminal` tool to execute either `conda info --envs` or `conda env list`. I\'m also remembering that the user is on zsh, so the exact commands might need adjusting.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 395 (char 394)
+
+  JSON 块 2:
+  原始: b'[[[null,"**Formulating the Tool Call**\\n\\nI\'ve decided to use `run_in_terminal` to get the list. The specific command will be `conda env list`, as it\'s a standard method. I also want the output immediately, so I\'ll set `isBackground` to `false`. Now, I\'m working on the final tool call structure.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 367 (char 366)
+
+  JSON 块 3:
+  原始: b'[[[null,"{\\"tool_call\\": {\\"name\\": \\"run_in_terminal\\", \\"arguments\\": {\\"command\\": \\"conda env list\\", \\"explanation\\": \\"\xe5\x88\x97\xe5\x87\xba\xe6\x89\x80\xe6\x9c\x89 conda \xe7\x8e\xaf\xe5\xa2\x83\\", \\"isBackground\\": false}}}"]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 181 (char 180)
+
+--- Chunk 4 ---
+原始数据: b'[[[[[[[[null,"**Investigating Conda Environments**\\n\\nI\'m thinking about how to show the user their current conda environments. My initial plan is to use the `run_in_terminal` tool to execute either `conda info --envs` or `conda env list`. I\'m also remembering that the user is on zsh, so the exact commands might need adjusting.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]],null,[7705,null,7705,null,[[1,7705]]],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[[[[[[null,"**Formulating the Tool Call**\\n\\nI\'ve decided to use `run_in_terminal` to get the list. The specific command will be `conda env list`, as it\'s a standard method. I also want the output immediately, so I\'ll set `isBackground` to `false`. Now, I\'m working on the final tool call structure.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]],null,[7705,null,7705,null,[[1,7705]]],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[[[[[[null,"{\\"tool_call\\": {\\"name\\": \\"run_in_terminal\\", \\"arguments\\": {\\"command\\": \\"conda env list\\", \\"explanation\\": \\"\xe5\x88\x97\xe5\x87\xba\xe6\x89\x80\xe6\x9c\x89 conda \xe7\x8e\xaf\xe5\xa2\x83\\", \\"isBackground\\": false}}}"]],"model"]]],null,[7705,42,7873,null,[[1,7705]],null,null,null,null,126],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[[[[[[null,"",null,null,null,null,null,null,null,null,null,null,null,null,"EvYECvMEAXLI2nx89ZZnG8E+WbAvpYhvCgAGoI3V0ho39LyCdvfdkGvoi9Hz0MZHrgBE+36a08bPFc4dPujWx9QWlAq/ra3eO5nbFJeYc0yXUncaN0qAqvgoKHsPL/MKNSQUQT5D4jG7FSjNxZ9A9AmVZCsvEpB+VHAyVslsW+oImVPrcr64acmKj/AqHO1VDBl+eGsQjLjXBwhyrplP76VzMzSm+E7QcdtKvs2ddlrZzYzUvQTNQZXppNSKAPHqbjuUhf9nFkOj4awf0xGjiB8dO6PE4ap61Ykdu7bsoQVJn+dWfv31DwMU3b/4Jxs1TnUdZjKBKjOBMKeMxQvFoqQWhTY+TlmLuo053/Om8NIg8G2Aspt955apBRPu7fGaLE9iCw3U1HfDreOzXxOsjGPTo3cN1KNO6BUyqoF8PQhQu4ARleHiBdEQ1u306qE0wbjIuR/yYuhH/k/esbHTkL9i+UrbqICG6srThPrs53JXRno7s2UnA168NCVK/7FhFpVI1uhsV9ZYCVlHQ0G8+W9rsltlSJvJ6BI6uc4r70bYEjzJxhBjL3u1xG46hsXhrUXTcL8UxfeKJzKrFcT6wtPxlpw8CjFavXJM3AGswznYT6jpnGwQ7E9NABZN5negSGgw/gNt+L1wmMak0pARwhSg6xolj/g0BnQrQipwObT8kMgfIYoMv7q0BkpPC75tFr7mv7vikdmXZDjXfDvy+/K/eLcmTSYVDGn9nABTsnmrA4qAodh1PZYoqJTieDQUdNjOfM0yxNi+3DbvCp0Hkjk28g+CW5uZ+V5Yt9eFuIwbNJB7pBt8KAbD6SRLGrxsx+JAGI/SPuIA"]],"model"],1]],null,[7705,42,7873,null,[[1,7705]],null,null,null,null,126],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"]'
+字节长度: 2479
+JSON 块数量: 3
+
+  JSON 块 1:
+  原始: b'[[[null,"**Investigating Conda Environments**\\n\\nI\'m thinking about how to show the user their current conda environments. My initial plan is to use the `run_in_terminal` tool to execute either `conda info --envs` or `conda env list`. I\'m also remembering that the user is on zsh, so the exact commands might need adjusting.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 395 (char 394)
+
+  JSON 块 2:
+  原始: b'[[[null,"**Formulating the Tool Call**\\n\\nI\'ve decided to use `run_in_terminal` to get the list. The specific command will be `conda env list`, as it\'s a standard method. I also want the output immediately, so I\'ll set `isBackground` to `false`. Now, I\'m working on the final tool call structure.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 367 (char 366)
+
+  JSON 块 3:
+  原始: b'[[[null,"{\\"tool_call\\": {\\"name\\": \\"run_in_terminal\\", \\"arguments\\": {\\"command\\": \\"conda env list\\", \\"explanation\\": \\"\xe5\x88\x97\xe5\x87\xba\xe6\x89\x80\xe6\x9c\x89 conda \xe7\x8e\xaf\xe5\xa2\x83\\", \\"isBackground\\": false}}}"]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 181 (char 180)
+
+--- Chunk 5 ---
+原始数据: b'[[[[[[[[null,"**Investigating Conda Environments**\\n\\nI\'m thinking about how to show the user their current conda environments. My initial plan is to use the `run_in_terminal` tool to execute either `conda info --envs` or `conda env list`. I\'m also remembering that the user is on zsh, so the exact commands might need adjusting.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]],null,[7705,null,7705,null,[[1,7705]]],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[[[[[[null,"**Formulating the Tool Call**\\n\\nI\'ve decided to use `run_in_terminal` to get the list. The specific command will be `conda env list`, as it\'s a standard method. I also want the output immediately, so I\'ll set `isBackground` to `false`. Now, I\'m working on the final tool call structure.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]],null,[7705,null,7705,null,[[1,7705]]],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[[[[[[null,"{\\"tool_call\\": {\\"name\\": \\"run_in_terminal\\", \\"arguments\\": {\\"command\\": \\"conda env list\\", \\"explanation\\": \\"\xe5\x88\x97\xe5\x87\xba\xe6\x89\x80\xe6\x9c\x89 conda \xe7\x8e\xaf\xe5\xa2\x83\\", \\"isBackground\\": false}}}"]],"model"]]],null,[7705,42,7873,null,[[1,7705]],null,null,null,null,126],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[[[[[[null,"",null,null,null,null,null,null,null,null,null,null,null,null,"EvYECvMEAXLI2nx89ZZnG8E+WbAvpYhvCgAGoI3V0ho39LyCdvfdkGvoi9Hz0MZHrgBE+36a08bPFc4dPujWx9QWlAq/ra3eO5nbFJeYc0yXUncaN0qAqvgoKHsPL/MKNSQUQT5D4jG7FSjNxZ9A9AmVZCsvEpB+VHAyVslsW+oImVPrcr64acmKj/AqHO1VDBl+eGsQjLjXBwhyrplP76VzMzSm+E7QcdtKvs2ddlrZzYzUvQTNQZXppNSKAPHqbjuUhf9nFkOj4awf0xGjiB8dO6PE4ap61Ykdu7bsoQVJn+dWfv31DwMU3b/4Jxs1TnUdZjKBKjOBMKeMxQvFoqQWhTY+TlmLuo053/Om8NIg8G2Aspt955apBRPu7fGaLE9iCw3U1HfDreOzXxOsjGPTo3cN1KNO6BUyqoF8PQhQu4ARleHiBdEQ1u306qE0wbjIuR/yYuhH/k/esbHTkL9i+UrbqICG6srThPrs53JXRno7s2UnA168NCVK/7FhFpVI1uhsV9ZYCVlHQ0G8+W9rsltlSJvJ6BI6uc4r70bYEjzJxhBjL3u1xG46hsXhrUXTcL8UxfeKJzKrFcT6wtPxlpw8CjFavXJM3AGswznYT6jpnGwQ7E9NABZN5negSGgw/gNt+L1wmMak0pARwhSg6xolj/g0BnQrQipwObT8kMgfIYoMv7q0BkpPC75tFr7mv7vikdmXZDjXfDvy+/K/eLcmTSYVDGn9nABTsnmrA4qAodh1PZYoqJTieDQUdNjOfM0yxNi+3DbvCp0Hkjk28g+CW5uZ+V5Yt9eFuIwbNJB7pBt8KAbD6SRLGrxsx+JAGI/SPuIA"]],"model"],1]],null,[7705,42,7873,null,[[1,7705]],null,null,null,null,126],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[null,null,null,["1764776000698863",5502140,3442171013]]'
+字节长度: 2536
+JSON 块数量: 3
+
+  JSON 块 1:
+  原始: b'[[[null,"**Investigating Conda Environments**\\n\\nI\'m thinking about how to show the user their current conda environments. My initial plan is to use the `run_in_terminal` tool to execute either `conda info --envs` or `conda env list`. I\'m also remembering that the user is on zsh, so the exact commands might need adjusting.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 395 (char 394)
+
+  JSON 块 2:
+  原始: b'[[[null,"**Formulating the Tool Call**\\n\\nI\'ve decided to use `run_in_terminal` to get the list. The specific command will be `conda env list`, as it\'s a standard method. I also want the output immediately, so I\'ll set `isBackground` to `false`. Now, I\'m working on the final tool call structure.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 367 (char 366)
+
+  JSON 块 3:
+  原始: b'[[[null,"{\\"tool_call\\": {\\"name\\": \\"run_in_terminal\\", \\"arguments\\": {\\"command\\": \\"conda env list\\", \\"explanation\\": \\"\xe5\x88\x97\xe5\x87\xba\xe6\x89\x80\xe6\x9c\x89 conda \xe7\x8e\xaf\xe5\xa2\x83\\", \\"isBackground\\": false}}}"]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 181 (char 180)
+
+--- Chunk 6 ---
+原始数据: b'[[[[[[[[null,"**Investigating Conda Environments**\\n\\nI\'m thinking about how to show the user their current conda environments. My initial plan is to use the `run_in_terminal` tool to execute either `conda info --envs` or `conda env list`. I\'m also remembering that the user is on zsh, so the exact commands might need adjusting.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]],null,[7705,null,7705,null,[[1,7705]]],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[[[[[[null,"**Formulating the Tool Call**\\n\\nI\'ve decided to use `run_in_terminal` to get the list. The specific command will be `conda env list`, as it\'s a standard method. I also want the output immediately, so I\'ll set `isBackground` to `false`. Now, I\'m working on the final tool call structure.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]],null,[7705,null,7705,null,[[1,7705]]],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[[[[[[null,"{\\"tool_call\\": {\\"name\\": \\"run_in_terminal\\", \\"arguments\\": {\\"command\\": \\"conda env list\\", \\"explanation\\": \\"\xe5\x88\x97\xe5\x87\xba\xe6\x89\x80\xe6\x9c\x89 conda \xe7\x8e\xaf\xe5\xa2\x83\\", \\"isBackground\\": false}}}"]],"model"]]],null,[7705,42,7873,null,[[1,7705]],null,null,null,null,126],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[[[[[[null,"",null,null,null,null,null,null,null,null,null,null,null,null,"EvYECvMEAXLI2nx89ZZnG8E+WbAvpYhvCgAGoI3V0ho39LyCdvfdkGvoi9Hz0MZHrgBE+36a08bPFc4dPujWx9QWlAq/ra3eO5nbFJeYc0yXUncaN0qAqvgoKHsPL/MKNSQUQT5D4jG7FSjNxZ9A9AmVZCsvEpB+VHAyVslsW+oImVPrcr64acmKj/AqHO1VDBl+eGsQjLjXBwhyrplP76VzMzSm+E7QcdtKvs2ddlrZzYzUvQTNQZXppNSKAPHqbjuUhf9nFkOj4awf0xGjiB8dO6PE4ap61Ykdu7bsoQVJn+dWfv31DwMU3b/4Jxs1TnUdZjKBKjOBMKeMxQvFoqQWhTY+TlmLuo053/Om8NIg8G2Aspt955apBRPu7fGaLE9iCw3U1HfDreOzXxOsjGPTo3cN1KNO6BUyqoF8PQhQu4ARleHiBdEQ1u306qE0wbjIuR/yYuhH/k/esbHTkL9i+UrbqICG6srThPrs53JXRno7s2UnA168NCVK/7FhFpVI1uhsV9ZYCVlHQ0G8+W9rsltlSJvJ6BI6uc4r70bYEjzJxhBjL3u1xG46hsXhrUXTcL8UxfeKJzKrFcT6wtPxlpw8CjFavXJM3AGswznYT6jpnGwQ7E9NABZN5negSGgw/gNt+L1wmMak0pARwhSg6xolj/g0BnQrQipwObT8kMgfIYoMv7q0BkpPC75tFr7mv7vikdmXZDjXfDvy+/K/eLcmTSYVDGn9nABTsnmrA4qAodh1PZYoqJTieDQUdNjOfM0yxNi+3DbvCp0Hkjk28g+CW5uZ+V5Yt9eFuIwbNJB7pBt8KAbD6SRLGrxsx+JAGI/SPuIA"]],"model"],1]],null,[7705,42,7873,null,[[1,7705]],null,null,null,null,126],null,null,null,null,"v1_ChdRRmd3YWVfVEtyenB6N0lQaGJtdDZRdxIXUUZnd2FlX1RLcnpwejdJUGhibXQ2UXc"],[null,null,null,["1764776000698863",5502140,3442171013]]]]'
+字节长度: 2538
+JSON 块数量: 3
+
+  JSON 块 1:
+  原始: b'[[[null,"**Investigating Conda Environments**\\n\\nI\'m thinking about how to show the user their current conda environments. My initial plan is to use the `run_in_terminal` tool to execute either `conda info --envs` or `conda env list`. I\'m also remembering that the user is on zsh, so the exact commands might need adjusting.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 395 (char 394)
+
+  JSON 块 2:
+  原始: b'[[[null,"**Formulating the Tool Call**\\n\\nI\'ve decided to use `run_in_terminal` to get the list. The specific command will be `conda env list`, as it\'s a standard method. I also want the output immediately, so I\'ll set `isBackground` to `false`. Now, I\'m working on the final tool call structure.\\n\\n\\n",null,null,null,null,null,null,null,null,null,null,1]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 367 (char 366)
+
+  JSON 块 3:
+  原始: b'[[[null,"{\\"tool_call\\": {\\"name\\": \\"run_in_terminal\\", \\"arguments\\": {\\"command\\": \\"conda env list\\", \\"explanation\\": \\"\xe5\x88\x97\xe5\x87\xba\xe6\x89\x80\xe6\x9c\x89 conda \xe7\x8e\xaf\xe5\xa2\x83\\", \\"isBackground\\": false}}}"]],"model"]]'
+  ❌ 解析失败: Extra data: line 1 column 181 (char 180)
+

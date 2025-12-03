@@ -20,8 +20,8 @@ def quick_test():
     # 尝试多个可能的日志文件
     log_files = [
         Path('logs/proxy_server.log'),
-        Path('logs/app.log'),
         Path('logs/headless.log'),
+        Path('logs/app.log'),
     ]
 
     log_file = None
@@ -52,10 +52,14 @@ def quick_test():
         print(f"✅ 找到 {len(matches)} 条原始响应日志")
         print()
         print("示例：")
-        # 显示前 3 条
-        for match in re.finditer(raw_response_pattern + r'.*', log_content)[:3]:
+        # 显示前 3 条（修复迭代器切片问题）
+        count = 0
+        for match in re.finditer(raw_response_pattern + r'.*', log_content):
+            if count >= 3:
+                break
             line = match.group(0)
             print(f"  {line[:100]}...")
+            count += 1
         print()
         print("✅ 原始数据捕获正常工作！")
         print()

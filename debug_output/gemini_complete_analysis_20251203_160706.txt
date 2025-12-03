@@ -1,0 +1,71 @@
+================================================================================
+Gemini API 原始响应完整分析
+分析时间: 2025-12-03 16:07:06.610263
+总 Chunk 数: 7
+================================================================================
+
+--- Chunk 1 ---
+字节长度: 9
+解码成功: 9 字符
+❌ JSON 解析失败: Expecting value: line 1 column 1 (char 0)
+原始数据前 200 字符: test data
+
+--- Chunk 2 ---
+字节长度: 557
+解码成功: 557 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 558 (char 557)
+原始数据前 200 字符: [[[[[[[[null,"**Inspecting Conda Environments**\n\nI've determined I need to check for available tools to list the current conda environments. Running `conda info --envs` or `conda env list` in a term
+
+--- Chunk 3 ---
+字节长度: 1039
+解码成功: 1039 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 1040 (char 1039)
+原始数据前 200 字符: [[[[[[[[null,"**Inspecting Conda Environments**\n\nI've determined I need to check for available tools to list the current conda environments. Running `conda info --envs` or `conda env list` in a term
+
+--- Chunk 4 ---
+字节长度: 1394
+解码成功: 1382 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 1383 (char 1382)
+原始数据前 200 字符: [[[[[[[[null,"**Inspecting Conda Environments**\n\nI've determined I need to check for available tools to list the current conda environments. Running `conda info --envs` or `conda env list` in a term
+
+--- Chunk 5 ---
+字节长度: 2612
+解码成功: 2600 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 2601 (char 2600)
+原始数据前 200 字符: [[[[[[[[null,"**Inspecting Conda Environments**\n\nI've determined I need to check for available tools to list the current conda environments. Running `conda info --envs` or `conda env list` in a term
+
+--- Chunk 6 ---
+字节长度: 2669
+解码成功: 2657 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 2658 (char 2657)
+原始数据前 200 字符: [[[[[[[[null,"**Inspecting Conda Environments**\n\nI've determined I need to check for available tools to list the current conda environments. Running `conda info --envs` or `conda env list` in a term
+
+--- Chunk 7 ---
+字节长度: 2671
+解码成功: 2659 字符
+✅ JSON 解析成功
+提取到 3 个内容块:
+
+  内容块 1:
+  长度: 340 字符
+  预览: **Inspecting Conda Environments**
+
+I've determined I need to check for available tools to list the c...
+
+  内容块 2:
+  长度: 266 字符
+  预览: **Executing Environment Listing**
+
+I'm now integrating `run_in_terminal` to execute `conda info --en...
+
+  内容块 3:
+  长度: 144 字符
+  预览: {"tool_call": {"name": "run_in_terminal", "arguments": {"command": "conda info --envs", "explanation...
+
+================================================================================
+📊 分析总结
+================================================================================
+总 Chunk 数: 7
+总字节数: 10951
+总内容字符数: 750
+提取的内容块数: 3

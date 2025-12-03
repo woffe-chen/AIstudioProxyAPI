@@ -1,0 +1,127 @@
+================================================================================
+Gemini API 原始响应完整分析
+分析时间: 2025-12-03 17:16:16.166497
+总 Chunk 数: 11
+================================================================================
+
+--- Chunk 2 ---
+字节长度: 639
+解码成功: 639 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 640 (char 639)
+原始数据前 200 字符: [[[[[[[[null,"**Identifying the Active Environment**\n\nI'm focusing on the user's intent to view the current conda environment. While the previous command was `conda info --envs`, the explicit reques
+
+--- Chunk 3 ---
+字节长度: 1498
+解码成功: 1498 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 1499 (char 1498)
+原始数据前 200 字符: [[[[[[[[null,"**Identifying the Active Environment**\n\nI'm focusing on the user's intent to view the current conda environment. While the previous command was `conda info --envs`, the explicit reques
+
+--- Chunk 4 ---
+字节长度: 2216
+解码成功: 2216 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 2217 (char 2216)
+原始数据前 200 字符: [[[[[[[[null,"**Identifying the Active Environment**\n\nI'm focusing on the user's intent to view the current conda environment. While the previous command was `conda info --envs`, the explicit reques
+
+--- Chunk 5 ---
+字节长度: 2910
+解码成功: 2910 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 2911 (char 2910)
+原始数据前 200 字符: [[[[[[[[null,"**Identifying the Active Environment**\n\nI'm focusing on the user's intent to view the current conda environment. While the previous command was `conda info --envs`, the explicit reques
+
+--- Chunk 6 ---
+字节长度: 3093
+解码成功: 3091 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 3092 (char 3091)
+原始数据前 200 字符: [[[[[[[[null,"**Identifying the Active Environment**\n\nI'm focusing on the user's intent to view the current conda environment. While the previous command was `conda info --envs`, the explicit reques
+
+--- Chunk 7 ---
+字节长度: 3347
+解码成功: 3315 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 3316 (char 3315)
+原始数据前 200 字符: [[[[[[[[null,"**Identifying the Active Environment**\n\nI'm focusing on the user's intent to view the current conda environment. While the previous command was `conda info --envs`, the explicit reques
+
+--- Chunk 8 ---
+字节长度: 3624
+解码成功: 3568 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 3569 (char 3568)
+原始数据前 200 字符: [[[[[[[[null,"**Identifying the Active Environment**\n\nI'm focusing on the user's intent to view the current conda environment. While the previous command was `conda info --envs`, the explicit reques
+
+--- Chunk 9 ---
+字节长度: 3908
+解码成功: 3836 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 3837 (char 3836)
+原始数据前 200 字符: [[[[[[[[null,"**Identifying the Active Environment**\n\nI'm focusing on the user's intent to view the current conda environment. While the previous command was `conda info --envs`, the explicit reques
+
+--- Chunk 10 ---
+字节长度: 4162
+解码成功: 4068 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 4069 (char 4068)
+原始数据前 200 字符: [[[[[[[[null,"**Identifying the Active Environment**\n\nI'm focusing on the user's intent to view the current conda environment. While the previous command was `conda info --envs`, the explicit reques
+
+--- Chunk 11 ---
+字节长度: 8380
+解码成功: 8286 字符
+❌ JSON 解析失败: Expecting ',' delimiter: line 1 column 8287 (char 8286)
+原始数据前 200 字符: [[[[[[[[null,"**Identifying the Active Environment**\n\nI'm focusing on the user's intent to view the current conda environment. While the previous command was `conda info --envs`, the explicit reques
+
+--- Chunk 12 ---
+字节长度: 8439
+解码成功: 8345 字符
+✅ JSON 解析成功
+提取到 9 个内容块:
+
+  内容块 1:
+  长度: 420 字符
+  预览: **Identifying the Active Environment**
+
+I'm focusing on the user's intent to view the current conda ...
+
+  内容块 2:
+  长度: 641 字符
+  预览: **Determining Best Approach**
+
+I'm now considering the best command to retrieve the requested inform...
+
+  内容块 3:
+  长度: 502 字符
+  预览: **Verifying the Active Env**
+
+I've realized the user might be seeking confirmation or have had their...
+
+  内容块 4:
+  长度: 478 字符
+  预览: **Analyzing Further Details**
+
+I'm now focusing on ensuring that the provided information addresses ...
+
+  内容块 5:
+  长度: 1 字符
+  预览: 我...
+
+  内容块 6:
+  长度: 43 字符
+  预览: 将在终端中运行 `conda info --envs` 来列出所有 Conda 环境，...
+
+  内容块 7:
+  长度: 63 字符
+  预览: 并标识出当前激活的环境。
+
+```json
+{"tool_call": {"name": "run_in_terminal",...
+
+  内容块 8:
+  长度: 78 字符
+  预览:  "arguments": {"command": "conda info --envs", "explanation": "列出所有 Conda 环境，星...
+
+  内容块 9:
+  长度: 47 字符
+  预览: 号 (*) 表示当前激活的环境。", "isBackground": false}}}
+```...
+
+================================================================================
+📊 分析总结
+================================================================================
+总 Chunk 数: 11
+总字节数: 42216
+总内容字符数: 2273
+提取的内容块数: 9

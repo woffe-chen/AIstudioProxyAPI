@@ -31,8 +31,8 @@ def extract_raw_responses_from_log(log_file=None):
     if log_file is None:
         log_files = [
             'logs/proxy_server.log',
-            'logs/app.log',
             'logs/headless.log',
+            'logs/app.log',
         ]
         for f in log_files:
             if Path(f).exists():
@@ -50,7 +50,8 @@ def extract_raw_responses_from_log(log_file=None):
 
     # 查找原始响应数据的日志
     # 格式: [RAW_RESPONSE] chunk_X: b'...'
-    raw_pattern = r'\[RAW_RESPONSE\] chunk_(\d+): (b\'.*?(?:\'|$))'
+    # 修复：匹配到行尾，处理数据中的转义引号
+    raw_pattern = r'\[RAW_RESPONSE\] chunk_(\d+): (b\'.+?)$'
 
     chunks = []
     for match in re.finditer(raw_pattern, log_content, re.MULTILINE):
@@ -96,8 +97,10 @@ def extract_raw_responses_from_log(log_file=None):
                     f.write(f"字节长度: {len(chunk_bytes)}\n")
 
                     # 尝试解析 JSON
-                    pattern = rb'\[\[\[null,.*?],"model"]]'
-                    matches = re.findall(pattern, chunk_bytes)
+                    # 修复：匹配完整的 JSON 块结构
+                    # 格式：[[[[[[null,"content"]],"model"]]],...]
+                    pattern = rb'\[\[\[null,"[^"]*(?:\\.[^"]*)*"(?:\]|,).*?\],"model"\]\]'
+                    matches = re.findall(pattern, chunk_bytes, re.DOTALL)
 
                     if matches:
                         f.write(f"JSON 块数量: {len(matches)}\n")

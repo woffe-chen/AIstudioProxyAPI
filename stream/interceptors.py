@@ -26,6 +26,9 @@ class HttpInterceptor:
         self._parse_call_count = 0        # parse_response 调用次数
         self._total_body_extracted = 0    # 从 Gemini API 提取的总字节数
         self._total_body_sent = 0         # 发送给客户端的总字节数
+
+        # Thinking 内容识别（用于将思考过程放入 reasoning_content 字段）
+        self._in_thinking_phase = True    # 是否处于 thinking 阶段（默认开始时为 True）
     
     @staticmethod
     def setup_logging():
@@ -192,9 +195,25 @@ class HttpInterceptor:
                         resp["body"] += content
                         self.logger.debug(f"[提取] 内容看起来像 JSON 但解析失败，当作文本处理")
                 else:
-                    # 普通文本内容
-                    resp["body"] += content
-                    self.logger.debug(f"[提取] ✓ 文本内容: {len(content)} 字符")
+                    # 【Thinking 内容识别】
+                    # 根据内容特征判断是 thinking 还是普通回复
+                    if self._in_thinking_phase:
+                        # 当前处于 thinking 阶段
+
+                        # 检测 thinking 是否结束：出现中文字符表示 thinking 结束
+                        if re.search(r'[\u4e00-\u9fff]', content):
+                            # 发现中文，thinking 阶段结束
+                            self._in_thinking_phase = False
+                            resp["body"] += content
+                            self.logger.debug(f"[提取] ✓ 普通内容（thinking 已结束）: {len(content)} 字符")
+                        else:
+                            # 仍然是英文 thinking 内容
+                            resp["reason"] += content
+                            self.logger.debug(f"[提取] ✓ Thinking 内容: {len(content)} 字符")
+                    else:
+                        # 已经结束 thinking 阶段，所有内容都是普通内容
+                        resp["body"] += content
+                        self.logger.debug(f"[提取] ✓ 普通内容: {len(content)} 字符")
 
             except Exception as e:
                 self.logger.debug(f"[提取] 内容解码失败: {e}")
@@ -401,6 +420,9 @@ class HttpInterceptor:
         self._parse_call_count = 0
         self._total_body_extracted = 0
         self._total_body_sent = 0
+
+        # 重置 thinking 阶段标志
+        self._in_thinking_phase = True
 
     def parse_toolcall_params(self, args):
         try:

@@ -1,0 +1,37 @@
+================================================================================
+Gemini API 原始响应数据
+捕获时间: 2025-12-03 15:43:04.495444
+================================================================================
+
+--- Chunk 2 ---
+原始数据: b'[[[[[[[[null,"**Acknowledging User Input**\\n\\nI\'
+❌ chunk 解析错误: unterminated string literal (detected at line 1) (<string>, line 1)
+
+--- Chunk 3 ---
+原始数据: b'[[[[[[[[null,"**Acknowledging User Input**\\n\\nI\'
+❌ chunk 解析错误: unterminated string literal (detected at line 1) (<string>, line 1)
+
+--- Chunk 1 ---
+原始数据: b'[[[[[[[[null,"**Investigating Conda Environments**\\n\\nI\'
+❌ chunk 解析错误: unterminated string literal (detected at line 1) (<string>, line 1)
+
+--- Chunk 2 ---
+原始数据: b'[[[[[[[[null,"**Investigating Conda Environments**\\n\\nI\'
+❌ chunk 解析错误: unterminated string literal (detected at line 1) (<string>, line 1)
+
+--- Chunk 3 ---
+原始数据: b'[[[[[[[[null,"**Investigating Conda Environments**\\n\\nI\'
+❌ chunk 解析错误: unterminated string literal (detected at line 1) (<string>, line 1)
+
+--- Chunk 4 ---
+原始数据: b'[[[[[[[[null,"**Investigating Conda Environments**\\n\\nI\'
+❌ chunk 解析错误: unterminated string literal (detected at line 1) (<string>, line 1)
+
+--- Chunk 5 ---
+原始数据: b'[[[[[[[[null,"**Investigating Conda Environments**\\n\\nI\'
+❌ chunk 解析错误: unterminated string literal (detected at line 1) (<string>, line 1)
+
+--- Chunk 6 ---
+原始数据: b'[[[[[[[[null,"**Investigating Conda Environments**\\n\\nI\'
+❌ chunk 解析错误: unterminated string literal (detected at line 1) (<string>, line 1)
+
